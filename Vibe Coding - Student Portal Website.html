@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexusUni — Student Academic Portal</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind Configuration for Dark Mode & Custom Fonts -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar for sleek UI */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.7);
+    }
+
+    /* Smooth view transitions */
+    .view-section {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
+      <!-- Brand Header -->
+      <div class="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-600/20">
+            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="font-display font-bold text-lg tracking-tight text-slate-900 dark:text-white block leading-none">NexusUni</span>
+            <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wider uppercase">Student Portal</span>
+          </div>
+        </div>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto" aria-label="Main Navigation">
+        <button onclick="switchTab('dashboard')" data-nav="dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button onclick="switchTab('schedule')" data-nav="schedule" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <i data-lucide="calendar-days" class="w-5 h-5"></i>
+          <span>Class Schedule</span>
+        </button>
+
+        <button onclick="switchTab('grades')" data-nav="grades" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <i data-lucide="award" class="w-5 h-5"></i>
+          <span>Grades & Progress</span>
+        </button>
+
+        <button onclick="switchTab('announcements')" data-nav="announcements" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <div class="flex items-center gap-3">
+            <i data-lucide="megaphone" class="w-5 h-5"></i>
+            <span>Announcements</span>
+          </div>
+          <span id="unread-badge" class="px-2 py-0.5 text-xs font-semibold rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">2</span>
+        </button>
+
+        <button onclick="switchTab('profile')" data-nav="profile" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <i data-lucide="user-circle" class="w-5 h-5"></i>
+          <span>Student Profile</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer: Term & Storage Status -->
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Fall Semester 2026</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Week 12 of 16 • Finals in 24 days</p>
+          <button onclick="resetDemoData()" class="mt-3 w-full py-1.5 px-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            Reset Demo Data
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 lg:pl-72 flex flex-col min-w-0">
+      <!-- Top Header Bar -->
+      <header class="sticky top-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleMobileSidebar(true)" class="lg:hidden p-2 -ml-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Open Navigation">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <div>
+            <h1 id="header-page-title" class="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white">Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-4">
+          <!-- Current Date Pill -->
+          <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400"></i>
+            <span id="current-date-display">Wednesday, Nov 25, 2026</span>
+          </div>
+
+          <!-- Dark/Light Theme Toggle -->
+          <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
+            <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          </button>
+
+          <!-- User Quick Profile Button -->
+          <button onclick="switchTab('profile')" class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-colors">
+            <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" onerror="this.src='https://placehold.co/100x100/4f46e5/ffffff?text=MR'" alt="Student Avatar" class="w-7 h-7 rounded-full object-cover ring-2 ring-brand-500/20" />
+            <span id="header-student-name" class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hidden sm:inline">Maya Reyes</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Dynamic Viewport -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+
+        <!-- ========================================================= -->
+        <!-- 1. DASHBOARD VIEW                                         -->
+        <!-- ========================================================= -->
+        <section id="view-dashboard" class="view-section space-y-6">
+          <!-- Welcome Banner -->
+          <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-600 p-6 sm:p-8 text-white shadow-lg shadow-brand-600/15">
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div class="space-y-2 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-medium text-indigo-100">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>B.S. Computer Science • Junior Standing</span>
+                </div>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-tight">
+                  Welcome back, <span id="welcome-student-name">Maya</span>!
+                </h2>
+                <p class="text-indigo-100 text-sm sm:text-base">
+                  You have <strong id="banner-classes-count" class="text-white font-semibold">3 classes</strong> today and <strong id="banner-tasks-count" class="text-white font-semibold">3 pending tasks</strong> due this week. Keep up the momentum!
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <button onclick="switchTab('schedule')" class="px-4 py-2.5 rounded-xl bg-white text-brand-700 font-semibold text-sm hover:bg-indigo-50 transition-colors shadow-sm flex items-center gap-2">
+                  <i data-lucide="calendar" class="w-4 h-4"></i>
+                  View Timetable
+                </button>
+                <button onclick="switchTab('grades')" class="px-4 py-2.5 rounded-xl bg-brand-800/60 hover:bg-brand-800/80 text-white border border-white/20 font-medium text-sm transition-colors flex items-center gap-2">
+                  <i data-lucide="calculator" class="w-4 h-4"></i>
+                  GPA Calculator
+                </button>
+              </div>
+            </div>
+            <!-- Decorative subtle shapes -->
+            <div class="absolute -right-12 -top-12 w-64 h-64 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="absolute right-24 -bottom-16 w-48 h-48 rounded-full bg-indigo-400/10 pointer-events-none"></div>
+          </div>
+
+          <!-- KPI Summary Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+            <!-- GPA Card -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-brand-300 dark:hover:border-brand-700 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cumulative GPA</span>
+                <div class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400 flex items-center justify-center">
+                  <i data-lucide="trending-up" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3 flex items-baseline gap-2">
+                <span id="kpi-gpa" class="font-display text-3xl font-bold text-slate-900 dark:text-white">3.86</span>
+                <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full">Dean's List</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Out of 4.00 scale • Top 8%</p>
+            </div>
+
+            <!-- Enrolled Credits -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-brand-300 dark:hover:border-brand-700 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Enrolled Credits</span>
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3 flex items-baseline gap-2">
+                <span id="kpi-credits" class="font-display text-3xl font-bold text-slate-900 dark:text-white">16.0</span>
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Credits (5 Courses)</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">84 / 120 Degree Credits Earned</p>
+            </div>
+
+            <!-- Attendance Rate -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-brand-300 dark:hover:border-brand-700 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Attendance Rate</span>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3 flex items-baseline gap-2">
+                <span class="font-display text-3xl font-bold text-slate-900 dark:text-white">96.4%</span>
+                <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">+1.2% vs avg</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">54 of 56 lectures attended</p>
+            </div>
+
+            <!-- Upcoming Deadlines -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-brand-300 dark:hover:border-brand-700 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pending Tasks</span>
+                <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                  <i data-lucide="clock" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3 flex items-baseline gap-2">
+                <span id="kpi-deadlines" class="font-display text-3xl font-bold text-slate-900 dark:text-white">3</span>
+                <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full">Due Soon</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Next: Algorithms Problem Set 5</p>
+            </div>
+          </div>
+
+          <!-- Dashboard Middle Grid: Today's Classes + Interactive Task Checklist -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Today's Classes Timeline (7 cols) -->
+            <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col">
+              <div class="flex items-center justify-between mb-5">
+                <div>
+                  <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Today's Classes</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Wednesday Schedule • Fall 2026</p>
+                </div>
+                <button onclick="switchTab('schedule')" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1">
+                  Full Week <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <div id="dashboard-todays-classes" class="space-y-4 flex-1">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+
+            <!-- Interactive Assignments & Tasks Checklist (5 cols) -->
+            <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Tasks & Deadlines</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Saved automatically to your browser</p>
+                </div>
+                <span id="tasks-progress-pill" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">1/4 Done</span>
+              </div>
+
+              <!-- Add Quick Task Form -->
+              <form onsubmit="handleAddTask(event)" class="flex gap-2 mb-4">
+                <input type="text" id="new-task-input" placeholder="Add a study task or deadline..." required
+                  class="flex-1 px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                <button type="submit" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-colors flex items-center gap-1 shrink-0">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  Add
+                </button>
+              </form>
+
+              <!-- Task List -->
+              <div id="dashboard-task-list" class="space-y-2.5 overflow-y-auto max-h-72 pr-1 flex-1">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Announcements Preview -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Recent Campus Announcements</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Latest updates from departments & administration</p>
+              </div>
+              <button onclick="switchTab('announcements')" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1">
+                View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div id="dashboard-announcements-preview" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 2. CLASS SCHEDULE VIEW                                    -->
+        <!-- ========================================================= -->
+        <section id="view-schedule" class="view-section hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div>
+              <h2 class="font-display font-bold text-xl text-slate-900 dark:text-white">Fall 2026 Weekly Timetable</h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Click any course block to inspect syllabus details, room location, and instructor contact.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Day Filter (visible especially for mobile/list view) -->
+              <select id="schedule-day-filter" onchange="renderSchedule()" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="ALL">All Days (Mon–Fri)</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+              </select>
+
+              <!-- View Toggle Buttons -->
+              <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
+                <button onclick="setScheduleView('grid')" id="btn-schedule-grid" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5">
+                  <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                  Grid
+                </button>
+                <button onclick="setScheduleView('list')" id="btn-schedule-list" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5">
+                  <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                  Agenda
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schedule Container -->
+          <div id="schedule-container">
+            <!-- Dynamically rendered Grid or List -->
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 3. GRADES & ACADEMIC PROGRESS VIEW                        -->
+        <!-- ========================================================= -->
+        <section id="view-grades" class="view-section hidden space-y-6">
+          <!-- Header & Term Selector -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div>
+              <h2 class="font-display font-bold text-xl text-slate-900 dark:text-white">Academic Transcript & Gradebook</h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Monitor term performance or simulate final exam outcomes with the What-If GPA Calculator.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <label for="term-selector" class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Term:</label>
+              <select id="term-selector" onchange="renderGrades()" class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="Fall 2026">Fall 2026 (Current)</option>
+                <option value="Spring 2026">Spring 2026</option>
+                <option value="Fall 2025">Fall 2025</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Term Stats Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Term GPA</span>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="grades-term-gpa" class="font-display text-3xl font-bold text-brand-600 dark:text-brand-400">3.90</span>
+                <span id="grades-whatif-badge" class="hidden text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">Simulated</span>
+              </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Term Credits</span>
+              <div class="mt-2">
+                <span id="grades-term-credits" class="font-display text-3xl font-bold text-slate-900 dark:text-white">16.0</span>
+              </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">What-If Simulator</span>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="text-xs text-slate-600 dark:text-slate-300">Adjust projected scores in table</span>
+                <button onclick="resetWhatIfGrades()" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grades Table Card -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <th class="py-3.5 px-5">Course</th>
+                    <th class="py-3.5 px-4 text-center">Credits</th>
+                    <th class="py-3.5 px-4 text-center">Midterm (40%)</th>
+                    <th class="py-3.5 px-4 text-center">Final / Proj (60%)</th>
+                    <th class="py-3.5 px-4 text-center">Total %</th>
+                    <th class="py-3.5 px-4 text-center">Grade</th>
+                    <th class="py-3.5 px-5 text-right">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="grades-table-body" class="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+                  <!-- Populated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 4. ANNOUNCEMENTS VIEW                                     -->
+        <!-- ========================================================= -->
+        <section id="view-announcements" class="view-section hidden space-y-6">
+          <!-- Search and Category Filter Bar -->
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 class="font-display font-bold text-xl text-slate-900 dark:text-white">Campus Announcements</h2>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Stay informed about registration deadlines, academic seminars, and campus events.</p>
+              </div>
+              <div class="relative w-full md:w-72">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="announcement-search" oninput="renderAnnouncements()" placeholder="Search announcements..."
+                  class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+              </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button onclick="setAnnouncementCategory('All')" data-cat="All" class="ann-cat-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all">All Updates</button>
+              <button onclick="setAnnouncementCategory('Academic')" data-cat="Academic" class="ann-cat-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all">Academic</button>
+              <button onclick="setAnnouncementCategory('Campus Life')" data-cat="Campus Life" class="ann-cat-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all">Campus Life</button>
+              <button onclick="setAnnouncementCategory('Financial/Admin')" data-cat="Financial/Admin" class="ann-cat-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all">Financial & Admin</button>
+            </div>
+          </div>
+
+          <!-- Announcements Feed -->
+          <div id="announcements-feed" class="space-y-4">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 5. STUDENT PROFILE VIEW                                   -->
+        <!-- ========================================================= -->
+        <section id="view-profile" class="view-section hidden space-y-6">
+          <!-- Profile Cover & Header Card -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+            <div class="h-32 bg-gradient-to-r from-brand-600 via-indigo-600 to-slate-800"></div>
+            <div class="px-6 pb-6">
+              <div class="relative flex flex-col sm:flex-row sm:items-end justify-between -mt-12 mb-4 gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+                  <img id="profile-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" onerror="this.src='https://placehold.co/200x200/4f46e5/ffffff?text=MR'" alt="Maya Reyes"
+                    class="w-24 h-24 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-900 bg-white shadow-md" />
+                  <div class="pb-1">
+                    <div class="flex items-center gap-2.5">
+                      <h2 id="profile-display-name" class="font-display font-bold text-2xl text-slate-900 dark:text-white">Maya Reyes</h2>
+                      <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active Enrollment</span>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Student ID: <span class="font-mono font-semibold text-slate-700 dark:text-slate-300">2024-884920</span> • B.S. in Computer Science</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                    Advisor: <strong>Dr. Elena Vance</strong>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Quick Academic Metadata Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200 dark:border-slate-800 text-sm">
+                <div>
+                  <span class="text-xs text-slate-500 dark:text-slate-400 block">Academic Standing</span>
+                  <span class="font-semibold text-slate-900 dark:text-white">Good Standing (Dean's List)</span>
+                </div>
+                <div>
+                  <span class="text-xs text-slate-500 dark:text-slate-400 block">Expected Graduation</span>
+                  <span class="font-semibold text-slate-900 dark:text-white">May 2028</span>
+                </div>
+                <div>
+                  <span class="text-xs text-slate-500 dark:text-slate-400 block">University Email</span>
+                  <span class="font-semibold text-slate-900 dark:text-white">m.reyes@nexusuni.edu</span>
+                </div>
+                <div>
+                  <span class="text-xs text-slate-500 dark:text-slate-400 block">Campus Housing</span>
+                  <span class="font-semibold text-slate-900 dark:text-white">Oakridge Hall, Rm 412</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editable Personal Information Form -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Personal Information</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Update your preferred contact details. Changes persist in your browser's localStorage.</p>
+              </div>
+              <i data-lucide="shield-check" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+            </div>
+
+            <form onsubmit="handleSaveProfile(event)" class="space-y-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Preferred Display Name</label>
+                  <input type="text" id="input-preferred-name" required
+                    class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Mobile Phone Number</label>
+                  <input type="tel" id="input-phone" required
+                    class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Emergency Contact Name & Relation</label>
+                  <input type="text" id="input-emergency-contact" required
+                    class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Emergency Contact Phone</label>
+                  <input type="tel" id="input-emergency-phone" required
+                    class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Academic Bio & Interests</label>
+                <textarea id="input-bio" rows="3"
+                  class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+              </div>
+
+              <div class="flex items-center justify-end gap-3 pt-2">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-sm transition-colors flex items-center gap-2">
+                  <i data-lucide="save" class="w-4 h-4"></i>
+                  Save Profile Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- CLASS DETAILS MODAL                                       -->
+  <!-- ========================================================= -->
+  <div id="course-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl transform transition-all">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <span id="modal-course-code" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 mb-2">CS-301</span>
+          <h3 id="modal-course-title" class="font-display font-bold text-xl text-slate-900 dark:text-white">Algorithms & Data Structures</h3>
+        </div>
+        <button onclick="closeCourseModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70">
+          <div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 block">Instructor</span>
+            <span id="modal-course-prof" class="font-semibold text-slate-900 dark:text-white">Dr. Aris Thorne</span>
+          </div>
+          <div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 block">Location</span>
+            <span id="modal-course-room" class="font-semibold text-slate-900 dark:text-white">Turing Hall 204</span>
+          </div>
+          <div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 block">Schedule</span>
+            <span id="modal-course-time" class="font-semibold text-slate-900 dark:text-white">Mon / Wed • 09:00 AM</span>
+          </div>
+          <div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 block">Credits</span>
+            <span id="modal-course-credits" class="font-semibold text-slate-900 dark:text-white">4.0 Credits</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Course Overview & Syllabus</h4>
+          <p id="modal-course-desc" class="text-slate-600 dark:text-slate-300 leading-relaxed">
+            Covers asymptotic analysis, divide-and-conquer, dynamic programming, greedy algorithms, and graph traversal techniques.
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+          <span id="modal-course-email" class="text-xs text-slate-500 dark:text-slate-400 font-mono">a.thorne@nexusuni.edu</span>
+          <button onclick="copyInstructorEmail()" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            Copy Email
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- TOAST NOTIFICATION                                        -->
+  <!-- ========================================================= -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xl border border-slate-700 dark:border-slate-200 text-sm font-medium">
+      <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0"></i>
+      <span id="toast-message">Action completed!</span>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT APPLICATION LOGIC                              -->
+  <!-- ========================================================= -->
+  <script>
+    // ---------------------------------------------------------
+    // 1. DEFAULT MOCK DATA & STATE INITIALIZATION
+    // ---------------------------------------------------------
+    const STORAGE_KEY = 'nexusuni_student_portal_v1';
+
+    const DEFAULT_STATE = {
+      theme: 'light',
+      activeTab: 'dashboard',
+      scheduleView: 'grid',
+      announcementCategory: 'All',
+      profile: {
+        preferredName: 'Maya Reyes',
+        phone: '+1 (555) 234-8910',
+        emergencyContact: 'Carlos Reyes (Father)',
+        emergencyPhone: '+1 (555) 987-6543',
+        bio: 'Junior Computer Science student passionate about distributed systems, human-computer interaction, and open-source web tools.'
+      },
+      tasks: [
+        { id: 1, title: 'Submit CS-301 Dynamic Programming Problem Set 5', due: 'Today, 11:59 PM', completed: false },
+        { id: 2, title: 'Review Linear Algebra Eigenvalue Lecture Notes', due: 'Tomorrow', completed: true },
+        { id: 3, title: 'Prepare UI Prototype Slides for HCI Studio', due: 'Fri, Nov 27', completed: false },
+        { id: 4, title: 'Complete Spring 2027 Course Advising Survey', due: 'Mon, Nov 30', completed: false }
+      ],
+      courses: [
+        {
+          code: 'CS-301',
+          title: 'Algorithms & Data Structures',
+          prof: 'Dr. Aris Thorne',
+          email: 'a.thorne@nexusuni.edu',
+          room: 'Turing Hall 204',
+          credits: 4.0,
+          color: 'indigo',
+          days: ['Monday', 'Wednesday'],
+          startTime: '09:00 AM',
+          endTime: '10:30 AM',
+          slot: '09:00',
+          todayStatus: 'Completed',
+          description: 'Design and analysis of efficient algorithms: divide-and-conquer, dynamic programming, greedy methods, network flows, and NP-completeness.'
+        },
+        {
+          code: 'MATH-240',
+          title: 'Linear Algebra & Matrices',
+          prof: 'Prof. Julian Mercer',
+          email: 'j.mercer@nexusuni.edu',
+          room: 'Euler Center 112',
+          credits: 3.0,
+          color: 'emerald',
+          days: ['Tuesday', 'Thursday'],
+          startTime: '10:30 AM',
+          endTime: '12:00 PM',
+          slot: '10:30',
+          todayStatus: null,
+          description: 'Vector spaces, linear transformations, eigenvalues and eigenvectors, orthogonality, and singular value decomposition with computational applications.'
+        },
+        {
+          code: 'CS-342',
+          title: 'Human-Computer Interaction',
+          prof: 'Dr. Elena Vance',
+          email: 'e.vance@nexusuni.edu',
+          room: 'Design Studio B',
+          credits: 3.0,
+          color: 'amber',
+          days: ['Monday', 'Wednesday', 'Friday'],
+          startTime: '01:00 PM',
+          endTime: '02:00 PM',
+          slot: '13:00',
+          todayStatus: 'In Progress',
+          description: 'User-centered design methodologies, rapid prototyping, accessibility standards, usability testing, and cognitive psychology in interface design.'
+        },
+        {
+          code: 'STAT-310',
+          title: 'Probability & Statistical Inference',
+          prof: 'Dr. Nadia Patel',
+          email: 'n.patel@nexusuni.edu',
+          room: 'Science Complex 305',
+          credits: 3.0,
+          color: 'sky',
+          days: ['Tuesday', 'Thursday'],
+          startTime: '02:00 PM',
+          endTime: '03:30 PM',
+          slot: '14:00',
+          todayStatus: null,
+          description: 'Probability distributions, Bayesian inference, hypothesis testing, regression analysis, and Monte Carlo simulation techniques.'
+        },
+        {
+          code: 'PHIL-210',
+          title: 'Ethics in Artificial Intelligence',
+          prof: 'Prof. Marcus Sterling',
+          email: 'm.sterling@nexusuni.edu',
+          room: 'Humanities 108',
+          credits: 3.0,
+          color: 'rose',
+          days: ['Wednesday', 'Friday'],
+          startTime: '03:30 PM',
+          endTime: '04:45 PM',
+          slot: '15:30',
+          todayStatus: 'Upcoming',
+          description: 'Philosophical and societal examination of algorithmic fairness, privacy, autonomous systems, and governance frameworks.'
+        }
+      ],
+      gradesByTerm: {
+        'Fall 2026': [
+          { code: 'CS-301', name: 'Algorithms & Data Structures', credits: 4.0, midterm: 92, final: 95, breakdown: 'Assignments: 96% • Midterm: 92% • Final Project: 95%' },
+          { code: 'MATH-240', name: 'Linear Algebra & Matrices', credits: 3.0, midterm: 88, final: 91, breakdown: 'Quizzes: 90% • Midterm: 88% • Final Exam: 91%' },
+          { code: 'CS-342', name: 'Human-Computer Interaction', credits: 3.0, midterm: 95, final: 97, breakdown: 'Studio Labs: 98% • Midterm: 95% • Capstone App: 97%' },
+          { code: 'STAT-310', name: 'Probability & Statistical Inference', credits: 3.0, midterm: 85, final: 89, breakdown: 'Problem Sets: 91% • Midterm: 85% • Final Exam: 89%' },
+          { code: 'PHIL-210', name: 'Ethics in Artificial Intelligence', credits: 3.0, midterm: 94, final: 93, breakdown: 'Essays: 94% • Seminar Participation: 95% • Final Paper: 93%' }
+        ],
+        'Spring 2026': [
+          { code: 'CS-202', name: 'Computer Systems & Architecture', credits: 4.0, midterm: 90, final: 92, breakdown: 'Labs: 94% • Midterm: 90% • Final: 92%' },
+          { code: 'CS-250', name: 'Database Management Systems', credits: 3.0, midterm: 94, final: 96, breakdown: 'SQL Project: 97% • Midterm: 94% • Final: 96%' },
+          { code: 'MATH-210', name: 'Multivariable Calculus', credits: 4.0, midterm: 86, final: 88, breakdown: 'Homework: 90% • Midterm: 86% • Final: 88%' },
+          { code: 'ENG-204', name: 'Technical & Scientific Writing', credits: 3.0, midterm: 95, final: 94, breakdown: 'Drafts: 95% • Portfolio: 94%' }
+        ],
+        'Fall 2025': [
+          { code: 'CS-102', name: 'Object-Oriented Programming', credits: 4.0, midterm: 96, final: 98, breakdown: 'Projects: 98% • Midterm: 96% • Final: 98%' },
+          { code: 'MATH-150', name: 'Discrete Mathematics', credits: 4.0, midterm: 89, final: 91, breakdown: 'Proof Sets: 92% • Midterm: 89% • Final: 91%' },
+          { code: 'PHYS-120', name: 'Mechanics & Thermodynamics', credits: 4.0, midterm: 84, final: 87, breakdown: 'Labs: 91% • Midterm: 84% • Final: 87%' }
+        ]
+      },
+      announcements: [
+        {
+          id: 'ann-1',
+          title: 'Spring 2027 Priority Course Registration Opens Dec 2',
+          category: 'Academic',
+          author: 'Office of the University Registrar',
+          date: '2 hours ago',
+          priority: 'High Priority',
+          read: false,
+          summary: 'Priority registration windows for Junior and Senior standing students begin next Wednesday at 8:00 AM.',
+          content: 'Please ensure you have met with your academic advisor and cleared any registration holds prior to December 2. Course catalog seat availability for upper-level CS electives is now live in the curriculum planner.'
+        },
+        {
+          id: 'ann-2',
+          title: 'Extended 24/7 Library Hours During Finals Preparation',
+          category: 'Campus Life',
+          author: 'University Library Services',
+          date: 'Yesterday',
+          priority: 'Notice',
+          read: false,
+          summary: 'Starting December 1, the Main Science & Engineering Library will operate 24 hours a day through December 18.',
+          content: 'Quiet study zones on Floors 3 and 4 require valid student ID tap access after 10:00 PM. Complimentary coffee and study snacks will be served nightly at 9:00 PM in the atrium.'
+        },
+        {
+          id: 'ann-3',
+          title: '2026–2027 Undergraduate Research Grant Applications',
+          category: 'Academic',
+          author: 'Center for Undergraduate Research',
+          date: 'Nov 22, 2026',
+          priority: 'Opportunity',
+          read: true,
+          summary: 'Apply for up to $3,500 in stipend funding for faculty-mentored spring and summer research projects.',
+          content: 'Students across all STEM and Humanities disciplines are invited to submit a 2-page project proposal endorsed by a faculty sponsor by December 15.'
+        },
+        {
+          id: 'ann-4',
+          title: 'Winter Break Shuttle Schedule & Tuition Installment Reminder',
+          category: 'Financial/Admin',
+          author: 'Student Accounts & Transit',
+          date: 'Nov 19, 2026',
+          priority: 'Admin',
+          read: true,
+          summary: 'Final Fall installment plans close Nov 30; airport shuttle reservations for December break are now open.',
+          content: 'Students utilizing the monthly payment plan should verify their final automated draft scheduled for November 30. Campus-to-Airport express shuttles run hourly from Dec 17–20.'
+        }
+      ]
+    };
+
+    // Load state from localStorage or clone default
+    let state = loadState();
+    // Temporary simulated grades map (not saved permanently unless user edits)
+    let simulatedGrades = {};
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          return { ...DEFAULT_STATE, ...JSON.parse(saved) };
+        }
+      } catch (err) {
+        console.warn('Could not load saved state:', err);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.warn('Could not save state:', err);
+      }
+    }
+
+    function resetDemoData() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      simulatedGrades = {};
+      applyTheme();
+      renderAll();
+      showToast('Demo data restored to defaults');
+    }
+
+    // ---------------------------------------------------------
+    // 2. THEME & NAVIGATION MANAGEMENT
+    // ---------------------------------------------------------
+    function applyTheme() {
+      const htmlEl = document.documentElement;
+      if (state.theme === 'dark') {
+        htmlEl.classList.add('dark');
+      } else {
+        htmlEl.classList.remove('dark');
+      }
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      saveState();
+      applyTheme();
+      lucide.createIcons();
+    }
+
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      saveState();
+
+      // Hide all sections
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+      const activeSection = document.getElementById(`view-${tabId}`);
+      if (activeSection) {
+        activeSection.classList.remove('hidden');
+      }
+
+      // Update sidebar active styles
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isMatch = btn.getAttribute('data-nav') === tabId;
+        if (isMatch) {
+          btn.className = 'nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-brand-50 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 shadow-2xs transition-all';
+        } else {
+          btn.className = 'nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-200 transition-all';
+        }
+      });
+
+      // Update Header Page Title
+      const titles = {
+        dashboard: 'Dashboard',
+        schedule: 'Class Schedule',
+        grades: 'Grades & Academic Progress',
+        announcements: 'Announcements',
+        profile: 'Student Profile'
+      };
+      document.getElementById('header-page-title').textContent = titles[tabId] || 'Student Portal';
+
+      // Close mobile drawer if open
+      toggleMobileSidebar(false);
+
+      // Re-render icons
+      lucide.createIcons();
+    }
+
+    // ---------------------------------------------------------
+    // 3. DASHBOARD RENDERING & TASKS
+    // ---------------------------------------------------------
+    function renderDashboard() {
+      // Update Student Name across UI
+      const fullName = state.profile.preferredName;
+      const firstName = fullName.split(' ')[0];
+      document.getElementById('welcome-student-name').textContent = firstName;
+      document.getElementById('header-student-name').textContent = fullName;
+
+      // Render Today's Classes (Wednesday)
+      const todaysCourses = state.courses.filter(c => c.days.includes('Wednesday'));
+      document.getElementById('banner-classes-count').textContent = `${todaysCourses.length} classes`;
+
+      const classesContainer = document.getElementById('dashboard-todays-classes');
+      classesContainer.innerHTML = todaysCourses.map(course => {
+        const statusStyles = {
+          'Completed': 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+          'In Progress': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 ring-1 ring-emerald-500/30',
+          'Upcoming': 'bg-brand-50 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300'
+        };
+        const badgeClass = statusStyles[course.todayStatus] || statusStyles['Upcoming'];
+
+        return `
+          <div onclick="openCourseModal('${course.code}')" class="group cursor-pointer p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-brand-300 dark:hover:border-brand-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3.5">
+              <div class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center shrink-0 min-w-[76px]">
+                <span class="block text-xs font-bold text-slate-900 dark:text-white">${course.startTime.split(' ')[0]}</span>
+                <span class="block text-[10px] font-medium text-slate-400">${course.startTime.split(' ')[1]}</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-brand-600 dark:text-brand-400">${course.code}</span>
+                  <span class="text-slate-300 dark:text-slate-600">•</span>
+                  <span class="text-xs text-slate-500 dark:text-slate-400">${course.room}</span>
+                </div>
+                <h4 class="font-semibold text-sm text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">${course.title}</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${course.prof}</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">
+                ${course.todayStatus || 'Scheduled'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Interactive Tasks
+      const pendingTasks = state.tasks.filter(t => !t.completed);
+      const completedTasks = state.tasks.filter(t => t.completed);
+      document.getElementById('banner-tasks-count').textContent = `${pendingTasks.length} pending task${pendingTasks.length === 1 ? '' : 's'}`;
+      document.getElementById('kpi-deadlines').textContent = pendingTasks.length;
+      document.getElementById('tasks-progress-pill').textContent = `${completedTasks.length}/${state.tasks.length} Done`;
+
+      const taskListEl = document.getElementById('dashboard-task-list');
+      if (state.tasks.length === 0) {
+        taskListEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No tasks yet. Add one above!</p>`;
+      } else {
+        taskListEl.innerHTML = state.tasks.map(task => `
+          <div class="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <label class="flex items-start gap-3 cursor-pointer flex-1 min-w-0">
+              <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})"
+                class="mt-0.5 w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer" />
+              <div class="min-w-0 flex-1">
+                <p class="text-xs sm:text-sm font-medium truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}">
+                  ${escapeHTML(task.title)}
+                </p>
+                <span class="text-[11px] text-slate-400 block">${escapeHTML(task.due)}</span>
+              </div>
+            </label>
+            <button onclick="deleteTask(${task.id})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg transition-colors" title="Delete Task">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Render Announcements Preview (Top 3)
+      const previewEl = document.getElementById('dashboard-announcements-preview');
+      previewEl.innerHTML = state.announcements.slice(0, 3).map(ann => `
+        <div onclick="switchTab('announcements')" class="cursor-pointer p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-brand-300 dark:hover:border-brand-700 transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">${ann.category}</span>
+              <span class="text-[11px] text-slate-400">${ann.date}</span>
+            </div>
+            <h4 class="font-semibold text-sm text-slate-900 dark:text-white line-clamp-2 mb-1.5">${ann.title}</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${ann.summary}</p>
+          </div>
+          <span class="mt-3 text-xs font-semibold text-brand-600 dark:text-brand-400 inline-flex items-center gap-1">
+            Read more <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </div>
+      `).join('');
+    }
+
+    function handleAddTask(e) {
+      e.preventDefault();
+      const input = document.getElementById('new-task-input');
+      const title = input.value.trim();
+      if (!title) return;
+
+      state.tasks.unshift({
+        id: Date.now(),
+        title,
+        due: 'Added just now',
+        completed: false
+      });
+      input.value = '';
+      saveState();
+      renderDashboard();
+      lucide.createIcons();
+      showToast('Task added to your checklist');
+    }
+
+    function toggleTask(id) {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        saveState();
+        renderDashboard();
+        lucide.createIcons();
+      }
+    }
+
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      saveState();
+      renderDashboard();
+      lucide.createIcons();
+    }
+
+    // ---------------------------------------------------------
+    // 4. CLASS SCHEDULE RENDERING & MODAL
+    // ---------------------------------------------------------
+    function setScheduleView(view) {
+      state.scheduleView = view;
+      saveState();
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById('schedule-container');
+      const dayFilter = document.getElementById('schedule-day-filter').value;
+      const gridBtn = document.getElementById('btn-schedule-grid');
+      const listBtn = document.getElementById('btn-schedule-list');
+
+      // Update active toggle pill styling
+      if (state.scheduleView === 'grid') {
+        gridBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs flex items-center gap-1.5';
+        listBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5';
+      } else {
+        listBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs flex items-center gap-1.5';
+        gridBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5';
+      }
+
+      const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      const visibleDays = dayFilter === 'ALL' ? allDays : [dayFilter];
+
+      const colorMap = {
+        indigo: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800/80 text-indigo-900 dark:text-indigo-100',
+        emerald: 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/80 text-emerald-900 dark:text-emerald-100',
+        amber: 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-100',
+        sky: 'bg-sky-50 dark:bg-sky-950/60 border-sky-200 dark:border-sky-800/80 text-sky-900 dark:text-sky-100',
+        rose: 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/80 text-rose-900 dark:text-rose-100'
+      };
+
+      if (state.scheduleView === 'grid') {
+        // Weekly Column Grid View
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-${visibleDays.length} gap-4">
+            ${visibleDays.map(day => {
+              const dayCourses = state.courses
+                .filter(c => c.days.includes(day))
+                .sort((a, b) => a.slot.localeCompare(b.slot));
+
+              return `
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col">
+                  <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+                    <span class="font-display font-bold text-sm text-slate-900 dark:text-white">${day}</span>
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">${dayCourses.length}</span>
+                  </div>
+                  <div class="space-y-3 flex-1">
+                    ${dayCourses.length === 0 ? `<p class="text-xs text-slate-400 py-8 text-center">No classes</p>` : dayCourses.map(c => `
+                      <div onclick="openCourseModal('${c.code}')" class="cursor-pointer p-3.5 rounded-xl border ${colorMap[c.color]} hover:scale-[1.01] transition-transform shadow-2xs">
+                        <div class="flex items-center justify-between gap-1 mb-1">
+                          <span class="text-xs font-extrabold tracking-wide">${c.code}</span>
+                          <span class="text-[11px] font-medium opacity-80">${c.startTime}</span>
+                        </div>
+                        <h4 class="font-semibold text-xs sm:text-sm leading-snug mb-2">${c.title}</h4>
+                        <div class="space-y-1 text-[11px] opacity-80">
+                          <div class="flex items-center gap-1.5">
+                            <i data-lucide="map-pin" class="w-3 h-3 shrink-0"></i>
+                            <span>${c.room}</span>
+                          </div>
+                          <div class="flex items-center gap-1.5">
+                            <i data-lucide="user" class="w-3 h-3 shrink-0"></i>
+                            <span class="truncate">${c.prof}</span>
+                          </div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        // List / Agenda View
+        container.innerHTML = `
+          <div class="space-y-4">
+            ${visibleDays.map(day => {
+              const dayCourses = state.courses
+                .filter(c => c.days.includes(day))
+                .sort((a, b) => a.slot.localeCompare(b.slot));
+
+              return `
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
+                  <h3 class="font-display font-bold text-base text-slate-900 dark:text-white mb-3">${day}</h3>
+                  <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                    ${dayCourses.map(c => `
+                      <div onclick="openCourseModal('${c.code}')" class="cursor-pointer py-3.5 first:pt-1 last:pb-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-xl transition-colors">
+                        <div class="flex items-center gap-4">
+                          <span class="text-xs font-bold px-2.5 py-1 rounded-lg border ${colorMap[c.color]}">${c.code}</span>
+                          <div>
+                            <h4 class="font-semibold text-sm text-slate-900 dark:text-white">${c.title}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">${c.prof} • ${c.room}</p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          <span>${c.startTime} – ${c.endTime}</span>
+                          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function openCourseModal(code) {
+      const course = state.courses.find(c => c.code === code);
+      if (!course) return;
+
+      document.getElementById('modal-course-code').textContent = course.code;
+      document.getElementById('modal-course-title').textContent = course.title;
+      document.getElementById('modal-course-prof').textContent = course.prof;
+      document.getElementById('modal-course-room').textContent = course.room;
+      document.getElementById('modal-course-time').textContent = `${course.days.join('/')} • ${course.startTime}`;
+      document.getElementById('modal-course-credits').textContent = `${course.credits.toFixed(1)} Credits`;
+      document.getElementById('modal-course-desc').textContent = course.description;
+      document.getElementById('modal-course-email').textContent = course.email;
+
+      const modal = document.getElementById('course-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeCourseModal() {
+      const modal = document.getElementById('course-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function copyInstructorEmail() {
+      const email = document.getElementById('modal-course-email').textContent;
+      const tempInput = document.createElement('input');
+      tempInput.value = email;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showToast(`Copied ${email} to clipboard`);
+    }
+
+    // ---------------------------------------------------------
+    // 5. GRADES & WHAT-IF GPA CALCULATOR
+    // ---------------------------------------------------------
+    function percentageToGradeInfo(pct) {
+      if (pct >= 93) return { letter: 'A', points: 4.0, badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' };
+      if (pct >= 90) return { letter: 'A-', points: 3.7, badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' };
+      if (pct >= 87) return { letter: 'B+', points: 3.3, badge: 'bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300' };
+      if (pct >= 83) return { letter: 'B', points: 3.0, badge: 'bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300' };
+      if (pct >= 80) return { letter: 'B-', points: 2.7, badge: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' };
+      if (pct >= 77) return { letter: 'C+', points: 2.3, badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' };
+      if (pct >= 70) return { letter: 'C', points: 2.0, badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' };
+      return { letter: 'D', points: 1.0, badge: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300' };
+    }
+
+    function renderGrades() {
+      const term = document.getElementById('term-selector').value;
+      const courses = state.gradesByTerm[term] || [];
+      const tbody = document.getElementById('grades-table-body');
+
+      let totalPoints = 0;
+      let totalCredits = 0;
+      let hasSimulation = false;
+
+      tbody.innerHTML = courses.map((c, idx) => {
+        const simKey = `${term}-${c.code}`;
+        const activeFinal = simulatedGrades[simKey] !== undefined ? simulatedGrades[simKey] : c.final;
+        if (simulatedGrades[simKey] !== undefined) hasSimulation = true;
+
+        const weightedPct = Math.round((c.midterm * 0.4 + activeFinal * 0.6) * 10) / 10;
+        const gradeInfo = percentageToGradeInfo(weightedPct);
+
+        totalPoints += gradeInfo.points * c.credits;
+        totalCredits += c.credits;
+
+        return `
+          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-4 px-5">
+              <span class="font-bold text-xs text-brand-600 dark:text-brand-400 block">${c.code}</span>
+              <span class="font-semibold text-slate-900 dark:text-white">${c.name}</span>
+            </td>
+            <td class="py-4 px-4 text-center font-medium text-slate-600 dark:text-slate-300">${c.credits.toFixed(1)}</td>
+            <td class="py-4 px-4 text-center font-medium text-slate-700 dark:text-slate-300">${c.midterm}%</td>
+            <td class="py-4 px-4 text-center">
+              <input type="number" min="0" max="100" value="${activeFinal}"
+                onchange="updateSimulatedFinal('${term}', '${c.code}', this.value)"
+                aria-label="Simulated Final Score for ${c.code}"
+                class="w-16 px-2 py-1 text-center text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+            </td>
+            <td class="py-4 px-4 text-center font-bold text-slate-900 dark:text-white">${weightedPct.toFixed(1)}%</td>
+            <td class="py-4 px-4 text-center">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${gradeInfo.badge}">
+                ${gradeInfo.letter}
+              </span>
+            </td>
+            <td class="py-4 px-5 text-right">
+              <button onclick="toggleGradeBreakdown('bd-${idx}')" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                Breakdown
+              </button>
+            </td>
+          </tr>
+          <tr id="bd-${idx}" class="hidden bg-slate-50/90 dark:bg-slate-800/60">
+            <td colspan="7" class="py-2.5 px-5 text-xs text-slate-600 dark:text-slate-300">
+              <strong>Component Breakdown:</strong> ${c.breakdown}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const termGPA = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+      document.getElementById('grades-term-gpa').textContent = termGPA;
+      document.getElementById('grades-term-credits').textContent = totalCredits.toFixed(1);
+
+      const simBadge = document.getElementById('grades-whatif-badge');
+      if (hasSimulation) {
+        simBadge.classList.remove('hidden');
+      } else {
+        simBadge.classList.add('hidden');
+      }
+    }
+
+    function updateSimulatedFinal(term, code, val) {
+      const numeric = Math.max(0, Math.min(100, Number(val) || 0));
+      simulatedGrades[`${term}-${code}`] = numeric;
+      renderGrades();
+    }
+
+    function resetWhatIfGrades() {
+      simulatedGrades = {};
+      renderGrades();
+      showToast('Simulated scores reset to official records');
+    }
+
+    function toggleGradeBreakdown(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) row.classList.toggle('hidden');
+    }
+
+    // ---------------------------------------------------------
+    // 6. ANNOUNCEMENTS FEED & FILTERING
+    // ---------------------------------------------------------
+    function setAnnouncementCategory(cat) {
+      state.announcementCategory = cat;
+      renderAnnouncements();
+    }
+
+    function renderAnnouncements() {
+      const query = (document.getElementById('announcement-search').value || '').toLowerCase();
+      const activeCat = state.announcementCategory;
+
+      // Update Category Pill Styles
+      document.querySelectorAll('.ann-cat-btn').forEach(btn => {
+        const isMatch = btn.getAttribute('data-cat') === activeCat;
+        if (isMatch) {
+          btn.className = 'ann-cat-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-600 text-white shadow-2xs transition-all';
+        } else {
+          btn.className = 'ann-cat-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all';
+        }
+      });
+
+      // Update unread badge count in sidebar
+      const unreadCount = state.announcements.filter(a => !a.read).length;
+      const badgeEl = document.getElementById('unread-badge');
+      badgeEl.textContent = unreadCount;
+      badgeEl.classList.toggle('hidden', unreadCount === 0);
+
+      const filtered = state.announcements.filter(ann => {
+        const matchesCat = activeCat === 'All' || ann.category === activeCat;
+        const matchesQuery = ann.title.toLowerCase().includes(query) ||
+                             ann.summary.toLowerCase().includes(query) ||
+                             ann.author.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      const feedEl = document.getElementById('announcements-feed');
+      if (filtered.length === 0) {
+        feedEl.innerHTML = `
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-10 text-center">
+            <p class="text-sm text-slate-500 dark:text-slate-400">No announcements match your current search or filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      feedEl.innerHTML = filtered.map(ann => `
+        <article class="bg-white dark:bg-slate-900 rounded-2xl border ${ann.read ? 'border-slate-200 dark:border-slate-800' : 'border-brand-300 dark:border-brand-700 ring-1 ring-brand-500/10'} p-5 sm:p-6 transition-all">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div class="flex items-center gap-2">
+              ${!ann.read ? `<span class="w-2 h-2 rounded-full bg-brand-600" title="Unread"></span>` : ''}
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">${ann.category}</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">${ann.priority}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-400">${ann.date}</span>
+              <button onclick="toggleAnnouncementRead('${ann.id}')" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                ${ann.read ? 'Mark Unread' : 'Mark Read'}
+              </button>
+            </div>
+          </div>
+
+          <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-1">${ann.title}</h3>
+          <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">Posted by ${ann.author}</p>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-3">${ann.summary}</p>
+          
+          <details class="group">
+            <summary class="cursor-pointer text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline list-none inline-flex items-center gap-1">
+              <span>Show Full Details</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 group-open:rotate-180 transition-transform"></i>
+            </summary>
+            <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              ${ann.content}
+            </div>
+          </details>
+        </article>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function toggleAnnouncementRead(id) {
+      const item = state.announcements.find(a => a.id === id);
+      if (item) {
+        item.read = !item.read;
+        saveState();
+        renderAnnouncements();
+      }
+    }
+
+    // ---------------------------------------------------------
+    // 7. STUDENT PROFILE & LOCALSTORAGE PERSISTENCE
+    // ---------------------------------------------------------
+    function renderProfile() {
+      document.getElementById('profile-display-name').textContent = state.profile.preferredName;
+      document.getElementById('input-preferred-name').value = state.profile.preferredName;
+      document.getElementById('input-phone').value = state.profile.phone;
+      document.getElementById('input-emergency-contact').value = state.profile.emergencyContact;
+      document.getElementById('input-emergency-phone').value = state.profile.emergencyPhone;
+      document.getElementById('input-bio').value = state.profile.bio;
+    }
+
+    function handleSaveProfile(e) {
+      e.preventDefault();
+      state.profile = {
+        preferredName: document.getElementById('input-preferred-name').value.trim(),
+        phone: document.getElementById('input-phone').value.trim(),
+        emergencyContact: document.getElementById('input-emergency-contact').value.trim(),
+        emergencyPhone: document.getElementById('input-emergency-phone').value.trim(),
+        bio: document.getElementById('input-bio').value.trim()
+      };
+      saveState();
+      renderProfile();
+      renderDashboard();
+      showToast('Profile settings saved to localStorage');
+    }
+
+    // ---------------------------------------------------------
+    // 8. UTILITIES & INITIALIZATION
+    // ---------------------------------------------------------
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, match => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[match]));
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function renderAll() {
+      renderDashboard();
+      renderSchedule();
+      renderGrades();
+      renderAnnouncements();
+      renderProfile();
+      switchTab(state.activeTab || 'dashboard');
+    }
+
+    // Initialize on window load
+    window.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      renderAll();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
